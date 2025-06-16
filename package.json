@@ -1,0 +1,28 @@
+{
+  "name": "json2zod",
+  "version": "1.0.0",
+  "description": "A CLI tool and library to convert JSON to Zod schemas with optional OpenAPI examples.",
+  "main": "dist/generator.js",
+  "types": "dist/generator.d.ts",
+  "bin": {
+    "json2zod": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "zod",
+    "schema",
+    "json",
+    "cli",
+    "openapi",
+    "typescript"
+  ],
+  "author": "Yannick Burkard",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "typescript": "^5.8.3"
+  }
+}
