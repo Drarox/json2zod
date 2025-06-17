@@ -1,6 +1,6 @@
 {
   "name": "json2zod",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool and library to convert JSON to Zod schemas with optional OpenAPI examples.",
   "main": "dist/generator.js",
   "types": "dist/generator.d.ts",
@@ -22,6 +22,7 @@
   ],
   "author": "Yannick Burkard",
   "license": "MIT",
+  "homepage": "https://json2zod.pages.dev",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Drarox/json2zod.git"
