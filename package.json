@@ -17,10 +17,15 @@
     "json",
     "cli",
     "openapi",
+    "zod-openapi",
     "typescript"
   ],
   "author": "Yannick Burkard",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Drarox/json2zod.git"
+  },
   "devDependencies": {
     "@types/node": "^24.0.3",
     "typescript": "^5.8.3"
