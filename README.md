@@ -1,4 +1,9 @@
-# json2zod
+# Json2Zod
+
+[![npm version](https://img.shields.io/npm/v/json2zod?logo=npm)](https://www.npmjs.com/package/json2zod)
+[![npm downloads](https://img.shields.io/npm/dm/json2zod?logo=npm)](https://www.npmjs.com/package/json2zod)
+[![license](https://img.shields.io/npm/l/json2zod.svg)](https://github.com/YOUR-USERNAME/json2zod/blob/main/LICENSE)
+
 
 A CLI tool and library to convert JSON structures into [Zod](https://zod.dev) schemas — **with optional `.openapi({ example })` generation**, perfect for tools like:
 
@@ -14,6 +19,7 @@ This feature saves significant time when transforming example JSON data into Zod
 
 - [Features](#features)
 - [Output Example](#output-example)
+- [Browser Usage](#browser-usage)
 - [Installation](#installation)
 - [CLI Usage](#cli-usage)
   - [Passing JSON as an Argument](#passing-json-as-an-argument)
@@ -78,6 +84,16 @@ export const schema = z.object({
   }).openapi({ example: { darkMode: true } })
 });
 ```
+
+---
+
+## Browser Usage
+
+You can also use `json2zod` directly in your browser via the live playground:
+
+🌐 **[json2zod.pages.dev](https://json2zod.pages.dev/)**
+
+No installation needed — paste your JSON, configure options, and get your Zod schema instantly!
 
 ---
 

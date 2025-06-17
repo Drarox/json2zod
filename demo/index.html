@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors duration-500">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://yannick-burkard.eu.org/favicon.ico">
+    <title>Json2Zod Schema Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue.js CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <style>
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #e2e8f0; /* Light gray */
+            border-radius: 10px;
+        }
+        html.dark textarea::-webkit-scrollbar-track {
+            background: #4a5568; /* Darker gray for dark mode */
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* Slate */
+            border-radius: 10px;
+        }
+        html.dark textarea::-webkit-scrollbar-thumb {
+            background: #718096; /* Darker slate for dark mode */
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* Darker Slate */
+        }
+        html.dark textarea::-webkit-scrollbar-thumb:hover {
+            background: #5a67d8; /* Darker slate on hover */
+        }
+    </style>
+</head>
+<!-- Apply dynamic background and text colors based on dark mode -->
+<body class="bg-gradient-to-br from-indigo-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 min-h-screen font-sans antialiased text-gray-800 dark:text-gray-100 flex flex-col relative transition-colors duration-500">
+<div id="app" class="flex-grow container mx-auto p-6 flex flex-col">
+    <!-- Header -->
+    <header class="text-center mb-10">
+        <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 mb-4">Json2Zod Schema Generator</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-4">Convert your JSON data into Zod schemas instantly, with optional OpenAPI examples.</p>
+        <div class="flex justify-center items-center space-x-4">
+            <a href="https://github.com/Drarox/json2zod" target="_blank" rel="noopener noreferrer" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition duration-300 ease-in-out">
+                    <span class="inline-flex items-center gap-1">
+                        <!-- GitHub Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github w-5 h-5" viewBox="0 0 16 16">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+                        </svg>
+                        GitHub
+                    </span>
+            </a>
+            <a href="https://www.npmjs.com/package/json2zod" target="_blank" rel="noopener noreferrer" class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition duration-300 ease-in-out">
+                    <span class="inline-flex items-center gap-1">
+                        <!-- npm Icon -->
+                        <svg fill="currentColor" class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <g data-name="Layer 2">
+                                <g data-name="npm">
+                                    <rect width="24" height="24" opacity="0"/>
+                                    <path d="M18 3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h7V11h4v10h1a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3z"/>
+                                </g>
+                            </g>
+                        </svg>
+                        npm
+                    </span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main content area -->
+    <main class="flex flex-col lg:flex-row flex-grow gap-8">
+        <!-- Left panel: JSON Input -->
+        <section class="w-full lg:w-1/2 flex flex-col">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col flex-grow border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Input JSON</h2>
+                    <button
+                            @click="clearJsonInput"
+                            :disabled="!jsonInput"
+                            class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    >
+                        Clear
+                    </button>
+                </div>
+                <textarea
+                        v-model="jsonInput"
+                        @input="generateSchema"
+                        placeholder='Enter your JSON here, e.g., {"name": "John Doe", "age": 30, "isStudent": false}'
+                        class="flex-grow w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-300 dark:focus:ring-indigo-600 focus:border-indigo-500 dark:focus:border-indigo-500 transition duration-200 ease-in-out text-gray-700 dark:text-gray-200 resize-none font-mono bg-white dark:bg-gray-900"
+                        rows="15"
+                ></textarea>
+                <div class="mt-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input
+                                type="checkbox"
+                                id="addOpenApiExamples"
+                                v-model="addOpenApiExamples"
+                                @change="generateSchema"
+                                class="form-checkbox h-5 w-5 text-indigo-600 dark:text-indigo-400 rounded-md transition duration-150 ease-in-out bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
+                        >
+                        <label for="addOpenApiExamples" class="ml-2 text-gray-700 dark:text-gray-200 select-none">Add OpenAPI Examples</label>
+                    </div>
+                    <button
+                            @click="formatJson"
+                            :disabled="!jsonInput"
+                            class="px-5 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Format JSON
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right panel: Zod Schema Output -->
+        <section class="w-full lg:w-1/2 flex flex-col">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col flex-grow border border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Generated Zod Schema</h2>
+                <div v-if="errorMessage" class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-md mb-4" role="alert">
+                    <p class="font-bold">Error:</p>
+                    <p class="text-sm">{{ errorMessage }}</p>
+                </div>
+                <pre class="flex-grow w-full p-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg overflow-auto text-gray-700 dark:text-gray-200 font-mono text-sm relative"><code ref="outputCode">{{ zodSchemaOutput }}</code></pre>
+                <button
+                        @click="copyToClipboard"
+                        :disabled="!zodSchemaOutput"
+                        class="mt-4 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Copy to Clipboard
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-10 text-center text-gray-500 dark:text-gray-400 text-sm">
+        <p>&copy; {{ new Date().getFullYear() }} Json2Zod. Created by <a href="https://github.com/Drarox" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline">Drarox</a>.</p>
+    </footer>
+
+    <!-- Toast Notification for Copy -->
+    <div v-if="showCopyMessage" class="fixed bottom-6 right-6 bg-green-500 text-white px-5 py-3 rounded-lg shadow-xl transition-all duration-300 ease-out transform" :class="{'translate-y-0 opacity-100': showCopyMessage, 'translate-y-full opacity-0': !showCopyMessage}">
+        Copied to clipboard!
+    </div>
+</div>
+
+<script>
+    // Inline definitions for generateZodSchema, inferZodType, and generateObjectSchemaString
+
+    /**
+     * Recursively infers the appropriate Zod type for a given JavaScript value.
+     * Conditionally includes an OpenAPI example based on the `addOpenApiExamples` setting.
+     *
+     * @param value The JavaScript value to infer the Zod type for.
+     * @param addOpenApiExamples A boolean indicating whether to add `.openapi({ example: ... })` calls.
+     * @returns A string representing the Zod type definition, potentially with an OpenAPI example.
+     */
+    function inferZodType(value, addOpenApiExamples) {
+        const exampleValueString = JSON.stringify(value); // Stringify for use in example
+        let baseZodType;
+
+        switch (typeof value) {
+            case 'string':
+                baseZodType = 'z.string()';
+                break;
+            case 'number':
+                baseZodType = 'z.number()';
+                break;
+            case 'boolean':
+                baseZodType = 'z.boolean()';
+                break;
+            case 'object':
+                if (value === null) {
+                    // Handle explicit null values
+                    baseZodType = 'z.null()';
+                } else if (Array.isArray(value)) {
+                    // Handle arrays recursively
+                    if (value.length > 0) {
+                        // If array is not empty, infer the type of its first element
+                        const innerType = inferZodType(value[0], addOpenApiExamples);
+                        baseZodType = `z.array(${innerType})`;
+                    } else {
+                        // If array is empty, default to array of any
+                        baseZodType = `z.array(z.any())`;
+                    }
+                } else {
+                    // Handle nested objects recursively
+                    baseZodType = generateObjectSchemaString(value, addOpenApiExamples);
+                }
+                break;
+            default:
+                // Fallback for other types like 'undefined', 'symbol', 'bigint', 'function'
+                baseZodType = `z.any()`;
+        }
+
+        // Conditionally append the .openapi({ example: ... }) call
+        if (addOpenApiExamples) {
+            return `${baseZodType}.openapi({ example: ${exampleValueString} })`;
+        } else {
+            return baseZodType;
+        }
+    }
+
+    /**
+     * Generates a Zod object schema string for a given JavaScript object.
+     * This function is called recursively for nested objects.
+     *
+     * @param obj The JavaScript object to generate the schema for.
+     * @param addOpenApiExamples A boolean indicating whether to add `.openapi({ example: ... })` calls.
+     * @returns A string representing the Zod object schema.
+     */
+    function generateObjectSchemaString(obj, addOpenApiExamples) {
+        const schemaParts = [];
+
+        // Iterate over the properties of the object to build its schema
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = obj[key];
+                // Recursively infer the Zod type for each property
+                schemaParts.push(`    ${key}: ${inferZodType(value, addOpenApiExamples)}`);
+            }
+        }
+        return `z.object({\n${schemaParts.join(',\n')}\n})`;
+    }
+
+    /**
+     * Generates the complete Zod schema string from the initial input JSON data.
+     * This handles both single objects and arrays of objects at the top level.
+     *
+     * @param inputJson The parsed JSON object or array of objects to base the schema on.
+     * @param options Configuration options.
+     * @param options.addOpenApiExamples A boolean indicating whether to add `.openapi({ example: ... })` calls.
+     * Defaults to `false`.
+     * @returns A string containing the complete TypeScript code for the Zod schema.
+     */
+    function generateZodSchema(inputJson, options) {
+        // Default to false for addOpenApiExamples if not provided
+        const addOpenApiExamples = options?.addOpenApiExamples ?? false;
+
+        let schemaBody; // This will hold the z.object(...) or z.array(z.object(...)) part
+
+        if (Array.isArray(inputJson)) {
+            if (inputJson.length === 0) {
+                // Handle empty top-level array
+                schemaBody = `z.array(z.object({}))`;
+            } else {
+                // Generate schema for the first element and wrap it in z.array()
+                schemaBody = `z.array(${generateObjectSchemaString(inputJson[0], addOpenApiExamples)})`;
+            }
+        } else if (typeof inputJson === 'object' && inputJson !== null) {
+            // Generate schema for a single top-level object
+            schemaBody = generateObjectSchemaString(inputJson, addOpenApiExamples);
+        } else {
+            // Handle invalid top-level input type, returning z.any() as a fallback schema.
+            return `export const schema = z.any();`;
+        }
+
+        // The output string now *only* contains the schema definition.
+        // It is assumed that 'z' is globally available or imported by the consuming environment.
+        return `export const schema = ${schemaBody};`;
+    }
+
+    // Vue.js Application
+    const { createApp, ref, watch, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            const jsonInput = ref('');
+            const zodSchemaOutput = ref('');
+            const errorMessage = ref('');
+            const addOpenApiExamples = ref(false); // Initialized later from localStorage
+            const showCopyMessage = ref(false);
+            const isDarkMode = ref(false); // Initialized later from localStorage/system preference
+
+            // Function to apply/remove 'dark' class on the html element
+            const applyTheme = (isDark) => {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            };
+
+            const generateSchema = () => {
+                errorMessage.value = ''; // Clear previous errors
+                zodSchemaOutput.value = ''; // Clear previous output
+
+                if (!jsonInput.value.trim()) {
+                    zodSchemaOutput.value = '// Enter JSON to generate Zod schema';
+                    return;
+                }
+
+                try {
+                    const parsedJson = JSON.parse(jsonInput.value);
+                    const options = { addOpenApiExamples: addOpenApiExamples.value };
+                    const result = generateZodSchema(parsedJson, options);
+                    zodSchemaOutput.value = `${result}`; // Removed 'import { z } from "zod";\n\n'
+                } catch (e) {
+                    errorMessage.value = `Invalid JSON input: ${e.message}`;
+                    zodSchemaOutput.value = '// Error parsing JSON. Please check your input.';
+                }
+            };
+
+            const formatJson = () => {
+                if (!jsonInput.value.trim()) {
+                    return;
+                }
+                try {
+                    const parsed = JSON.parse(jsonInput.value);
+                    jsonInput.value = JSON.stringify(parsed, null, 2);
+                    errorMessage.value = ''; // Clear error if formatting is successful
+                } catch (e) {
+                    errorMessage.value = `Cannot format invalid JSON: ${e.message}`;
+                }
+            };
+
+            const clearJsonInput = () => {
+                jsonInput.value = '';
+                errorMessage.value = '';
+                zodSchemaOutput.value = '// Enter JSON to generate Zod schema';
+            };
+
+            const copyToClipboard = () => {
+                if (zodSchemaOutput.value) {
+                    // Use document.execCommand('copy') for better iframe compatibility
+                    const textarea = document.createElement('textarea');
+                    textarea.value = zodSchemaOutput.value;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        showCopyMessage.value = true;
+                        setTimeout(() => {
+                            showCopyMessage.value = false;
+                        }, 2000); // Hide message after 2 seconds
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                        // Fallback for older browsers or specific environments
+                        prompt("Copy to clipboard: Ctrl+C, Enter", zodSchemaOutput.value);
+                    } finally {
+                        document.body.removeChild(textarea);
+                    }
+                }
+            };
+
+            // On component mounted, initialize theme and checkbox state from localStorage
+            onMounted(() => {
+                // Load dark mode preference based on system settings
+                isDarkMode.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(isDarkMode.value);
+
+                // Listen for changes in system dark mode preference
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+                    isDarkMode.value = event.matches;
+                    applyTheme(isDarkMode.value);
+                });
+
+                // Load "Add OpenAPI Examples" checkbox state
+                const savedAddOpenApiExamples = localStorage.getItem('addOpenApiExamples');
+                if (savedAddOpenApiExamples !== null) {
+                    addOpenApiExamples.value = savedAddOpenApiExamples === 'true';
+                }
+
+                // Load last JSON input
+                const savedJsonInput = localStorage.getItem('jsonInput');
+                if (savedJsonInput !== null) {
+                    jsonInput.value = savedJsonInput;
+                } else {
+                    // Initial example JSON if no saved input
+                    jsonInput.value = JSON.stringify({
+                        id: "usr_123",
+                        name: "Alice Smith",
+                        email: "alice@example.com",
+                        age: 28,
+                        isActive: true,
+                        roles: ["admin", "editor"],
+                        address: {
+                            street: "123 Main St",
+                            city: "Anytown",
+                            zip: "12345"
+                        },
+                        preferences: null
+                    }, null, 2);
+                }
+
+                // Generate schema based on initial state
+                generateSchema();
+            });
+
+            // Watch for changes in jsonInput to save to localStorage
+            watch(jsonInput, (newValue) => {
+                localStorage.setItem('jsonInput', newValue);
+            });
+
+            // Watch for changes in addOpenApiExamples to save to localStorage
+            watch(addOpenApiExamples, (newValue) => {
+                localStorage.setItem('addOpenApiExamples', newValue);
+            });
+
+            return {
+                jsonInput,
+                zodSchemaOutput,
+                errorMessage,
+                addOpenApiExamples,
+                showCopyMessage,
+                isDarkMode,
+                generateSchema,
+                formatJson,
+                clearJsonInput,
+                copyToClipboard,
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
