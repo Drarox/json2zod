@@ -1,4 +1,4 @@
-# Json2Zod
+# <svg width="32" height="30" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg"> <rect width="64" height="64" fill="transparent"/> <path d="M18 10L10 18V46L18 54" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/> <path d="M46 10L54 18V46L46 54" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/> <path d="M24 22L40 22L24 42L40 42" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/> </svg> Json2Zod
 
 [![npm version](https://img.shields.io/npm/v/json2zod?logo=npm)](https://www.npmjs.com/package/json2zod)
 [![npm downloads](https://img.shields.io/npm/dm/json2zod?logo=npm)](https://www.npmjs.com/package/json2zod)
